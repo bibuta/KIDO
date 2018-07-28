@@ -29,16 +29,20 @@ void(* resetFunc) (void) = 0;
 #define TFT_RST   48
 #define TFT_MISO  99
 //motoare
+int vit;
 #define E1 11
 #define M1 13
 #define E2 10
 #define M2 12
-int vit;
+//distante
+#define distmed 25
+#define distmic  5
+#define distf   12
+#define distl   20
+
 //delay
-int previousMillis = 300;
-int previousMillis1 = 2000;
-int previousMillis2 =  0;
-long interval = 1000;
+#define interval  1000
+int previousMillis =  0;
 
 //senzori ultrasonici
 long durationS1;
@@ -59,16 +63,15 @@ String state;
 String caut = "ploua";
 
 //verificari
-int ok = 0;
+int ok =  0;
+int oka = 0;
 int ok1 = 0;
-int sr = 0;
-int cr, cg, cb;
-int intoarcere, alarm;
+int sr =  0;
 int ret = 0;
-int buzzerState = LOW;
 int i;
-int oka=0;
-
+int intoarcere, alarm;
+int cr, cg, cb;
+int buzzerState = LOW;
 
 //imagini
 const unsigned char termo [] PROGMEM = {
@@ -175,8 +178,11 @@ const unsigned char somn [] PROGMEM = {
   0x00, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
   0x00, 0x78, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
+
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST, TFT_MISO);
+
 SoftwareSerial BT(A9, A8);
+
 void setup() {
   stop_lcd();
   servo_fata.attach(34);
@@ -537,7 +543,7 @@ void urmarire()
   {
     go(0, 0);
   }
-  else if (distanceS2 > 20 && distanceD2 > 20)
+  else if (distanceS2 > distl && distanceD2 > distl)
   {
     if (distanceF > 30)
     {
@@ -574,7 +580,7 @@ void sortare()
   }
   if (ok == 1)
   {
-    if ((distanceD1 < 5) || (distanceS1 < 5))
+    if ((distanceD1 < distmic) || (distanceS1 < distmic))
     {
       go(-150, -150);
       delay(700);
@@ -593,7 +599,7 @@ void sortare()
       go(0, 0);
       delay(200);
     }
-    if (((distanceD1 < 25) && (distanceD1 > 5))  || ((distanceS1 < 25) && (distanceS1 > 5)) )
+    if (((distanceD1 < distmed) && (distanceD1 > distmic))  || ((distanceS1 < distmed) && (distanceS1 > distmic)) )
     { if (distanceS1 < distanceD1)
       {
         go(0, 60);
@@ -608,12 +614,12 @@ void sortare()
     }
     else
     {
-      if (distanceF1 > 5 || distanceF1 < 20)
+      if (distanceF1 > distmic || distanceF1 < distl)
       {
         vit = (distanceF1 - 6) * 2.307 + 40;
 
       }
-      else if (distanceF1 > 20)
+      else if (distanceF1 > distl)
       {
         vit = 55;
 
@@ -621,7 +627,7 @@ void sortare()
       go(vit, vit);
     }
 
-    if (distanceF1 <= 5)
+    if (distanceF1 <= distmic)
     {
       go(100, 100);
       delay(650);
@@ -678,7 +684,7 @@ void sortare()
   }
   if (ok == 2)
   {
-    if ((distanceD1 < 5) || (distanceS1 < 5))
+    if ((distanceD1 < distmic) || (distanceS1 < distmic))
     {
       go(-150, -150);
       delay(600);
@@ -697,7 +703,7 @@ void sortare()
       go(0, 0);
       delay(200);
     }
-    if (((distanceD1 < 25) && (distanceD1 > 5))  || ((distanceS1 < 25) && (distanceS1 > 5)) )
+    if (((distanceD1 < distmed) && (distanceD1 > distmic))  || ((distanceS1 < distmed) && (distanceS1 > distmic)) )
     { if (distanceS1 < distanceD1)
       {
         go(0, 60);
@@ -712,7 +718,7 @@ void sortare()
     }
     else
     {
-      if (distanceF > 5 || distanceF < 20)
+      if (distanceF > distmic || distanceF < distl)
       {
         vit = (distanceF - 6) * 1.4 + 40;
       }
@@ -722,7 +728,7 @@ void sortare()
       }
       go(vit, vit);
     }
-    if (distanceF <= 12)
+    if (distanceF <= distf)
     {
       go(90, 90);
       delay(300);
@@ -776,7 +782,7 @@ void sortare()
       }
       state = "";
       senzori(1, 1, 1, 1, 1, 1);
-      if ((distanceD1 < 25) || (distanceS1 < 25))
+      if ((distanceD1 < distmed) || (distanceS1 < distmed))
       {
         if (distanceS1 < distanceD1)
         {
@@ -789,7 +795,7 @@ void sortare()
           delay(400);
         }
       }
-      else if ((distanceD2 < 25) || (distanceS2 < 25))
+      else if ((distanceD2 < distmed) || (distanceS2 < distmed))
       {
         if (distanceS2 < distanceD2)
         {
@@ -816,7 +822,7 @@ void localizare1()
     distanceF1 = 1;
 
   }
-  if ((distanceD1 < 5) || (distanceS1 < 5))
+  if ((distanceD1 < distmic) || (distanceS1 < distmic))
   {
     go(-150, -150);
     delay(700);
@@ -835,7 +841,7 @@ void localizare1()
     go(0, 0);
     delay(200);
   }
-  if (((distanceD1 < 25) && (distanceD1 > 5))  || ((distanceS1 < 25) && (distanceS1 > 5)) )
+  if (((distanceD1 < distmed) && (distanceD1 > distmic))  || ((distanceS1 < distmed) && (distanceS1 > distmic)) )
   { if (distanceS1 < distanceD1)
     {
       go(0, 60);
@@ -848,7 +854,7 @@ void localizare1()
   }
   else
     go(55, 55);
-  if (distanceF1 <= 5)
+  if (distanceF1 <= distmic)
   {
     go(100, 100);
     delay(650);
@@ -869,7 +875,7 @@ void localizare2()
     distanceF = 1;
   }
 
-  if ((distanceD1 < 5) || (distanceS1 < 5))
+  if ((distanceD1 < distmic) || (distanceS1 < distmic))
   {
     go(-150, -150);
     delay(600);
@@ -888,7 +894,7 @@ void localizare2()
     go(0, 0);
     delay(200);
   }
-  if (((distanceD1 < 25) && (distanceD1 > 5))  || ((distanceS1 < 25) && (distanceS1 > 5)) )
+  if (((distanceD1 < distmed) && (distanceD1 > distmic))  || ((distanceS1 < distmed) && (distanceS1 > distmic)) )
   { if (distanceS1 < distanceD1)
     {
       go(0, 60);
@@ -901,7 +907,7 @@ void localizare2()
   }
   else
     go(55, 55);
-  if (distanceF <= 12)
+  if (distanceF <= distf)
   {
     go(90, 90);
     delay(300);
@@ -919,10 +925,6 @@ void emotie(int a)
 { curatare_fata();
   if (a == 1) //fericit
   {
-    /*servo_gat1.attach(35);
-      servo_gat1.write(100);
-      delay(200);
-      servo_gat1.detach();*/
     tft.fillRoundRect(45, 15, 90, 20, 7, ILI9341_BLACK);
     tft.fillRoundRect(185, 15, 90, 20, 7, ILI9341_BLACK);
     tft.fillRoundRect(110, 190, 100, 20, 8, ILI9341_ORANGE);
@@ -951,7 +953,7 @@ void emotie(int a)
     tft.fillCircle(160, 225, 34, ILI9341_ORANGE);
     tft.fillRoundRect(110, 220, 100, 15, 8, ILI9341_ORANGE);
   }
-  if (a == 3)
+  if (a == 3) //uimit(dezactivata momentan)
   {
     tft.fillRoundRect(45, 15, 90, 20, 7, ILI9341_BLACK);
     tft.fillRoundRect(185, 15, 90, 20, 7, ILI9341_BLACK);
@@ -1007,7 +1009,7 @@ void start_lcd()
   tft.fillCircle(232, 102, 4, ILI9341_WHITE);
   tft.fillRoundRect(110, 190, 100, 20, 8, ILI9341_BLACK);
 }
-void stop_lcd();
+void stop_lcd()
 {
   servo_cap.attach(35); 
   servo_cap.write(155);
@@ -1086,7 +1088,7 @@ void alarma()
     }
 
   }
-  if (intoarcere == 0 && distanceF < 5)
+  if (intoarcere == 0 && distanceF < distmic)
   {
     if(oka!=1)
     {
@@ -1098,8 +1100,8 @@ void alarma()
   if (oka == 1)
   {
     unsigned long currentMillis = millis();
-    if (currentMillis - previousMillis2 > interval) {
-      previousMillis2 = currentMillis;
+    if (currentMillis - previousMillis > interval) {
+      previousMillis = currentMillis;
       if (buzzerState == LOW)
       {
         buzzerState = HIGH;
@@ -1114,4 +1116,3 @@ void alarma()
     }
   }
 }
-
